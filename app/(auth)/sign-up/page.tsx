@@ -3,11 +3,11 @@ import SocialButton from '@/components/shared/button/SocialButton'
 import LoginLogo from '@/components/shared/logo/LoginLogo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { login } from '@/lib/actions/auth/sign-in'
+import { signup } from '@/lib/actions/auth/sign-up'
 import { getSession } from '@/lib/actions/auth/session'
 import AuthErrorMessage from '@/components/shared/message/AuthErrorMessage'
 
-export default async function LoginPage({
+export default async function SignUpPage({
   searchParams,
 }: {
   searchParams: { message: string; _t: string }
@@ -18,18 +18,32 @@ export default async function LoginPage({
     redirect('/')
   }
 
-  const handleSignIn = async (formData: FormData) => {
+  const handleSignUp = async (formData: FormData) => {
     'use server'
 
-    const { error } = await login(formData)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
 
-    if (error) {
+    if (password !== confirmPassword) {
       return redirect(
-        `/sign-in?message=Could not authenticate user&_t=${Date.now()}`
+        `/sign-up?message=Passwords do not match&_t=${Date.now()}`
       )
     }
 
-    return redirect('/')
+    const { data, error } = await signup(formData)
+
+    if (error) {
+      const message = error.message
+        ? error.message
+        : 'Could not authenticate user'
+
+      return redirect(`/sign-up?message=${message}&_t=${Date.now()}`)
+    }
+
+    return redirect(
+      `/confirm?message=Check email(${email}) to continue sign in process`
+    )
   }
   return (
     <>
@@ -43,7 +57,7 @@ export default async function LoginPage({
         <div className="flex flex-col gap-1">
           <LoginLogo />
           <h1 className="font-semibold leading-normal text-lg text-center">
-            Sign In
+            Sign Up
           </h1>
         </div>
         <div className="flex flex-col justify-start gap-8">
@@ -64,7 +78,7 @@ export default async function LoginPage({
             </p>
             <div className="flex flex-nowrap items-stretch justify-start flex-1 h-[1px] bg-black/[0.16]"></div>
           </div>
-          <form action={handleSignIn} className="flex flex-col gap-4">
+          <form action={handleSignUp} className="flex flex-col gap-4">
             <div className="flex flex-col">
               <label
                 className="text-[rgb(20, 20, 20)] font-medium text-[0.8125rem] leading-[1.375] mb-2"
@@ -94,7 +108,22 @@ export default async function LoginPage({
                 required
               />
             </div>
-            <Button>Sign In</Button>
+            <div className="flex flex-col">
+              <label
+                className="text-[rgb(20, 20, 20)] font-medium text-[0.8125rem] leading-[1.375] mb-2"
+                htmlFor="confirm-password"
+              >
+                Confirm Password
+              </label>
+              <Input
+                id="confirm-password"
+                name="confirmPassword"
+                type="password"
+                placeholder="请输入密码"
+                required
+              />
+            </div>
+            <Button>Sign Up</Button>
           </form>
         </div>
       </div>

@@ -57,9 +57,9 @@ const SocialButton = ({
         className="flex-shrink-0 min-w-4 min-h-4 w-[1em] h-[1em] opacity-0 -translate-x-2 transition-all group-focus:opacity-50 group-focus:translate-x-0 group-hover:opacity-50 group-hover:translate-x-0"
       >
         <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
           d="M3.3 10h13.4m-5-5 5 5-5 5"
         ></path>
       </svg>

@@ -1,9 +1,7 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-
 import { createClient } from '@/lib/supabase/server'
+import { AuthError } from '@supabase/supabase-js'
 
 export async function signup(formData: FormData) {
   const supabase = createClient()
@@ -16,6 +14,10 @@ export async function signup(formData: FormData) {
   }
 
   const res = await supabase.auth.signUp(data)
+
+  if (res.data.user?.role !== 'authenticated') {
+    res.error = new AuthError('Sign up Repeat Email!')
+  }
 
   return res
 }
